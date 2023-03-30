@@ -15,8 +15,8 @@
 
 set -e
 
-BUILD_BASE=$(pwd)
-VERSION=${VERSION:-master}
+BUILD_BASE=$(pwd) && echo "BUILD_BASE: ${BUILD_BASE}"
+VERSION=${VERSION:-master} && echo "VERSION: ${VERSION}"
 
 printf "LANG=en_US.utf-8\nLC_ALL=en_US.utf-8" >> /etc/environment
 
@@ -31,7 +31,20 @@ yum install -y \
   libX11-devel libxkbcommon-x11-devel libXScrnSaver-devel libXtst-devel mercurial \
   mod_ssl ncurses-compat-libs nspr-devel nss-devel pam-devel pango-devel \
   pciutils-devel php php-cli pkgconfig pulseaudio-libs-devel python python3 \
-  tar zlib zlib-devel
+  tar zlib zlib-devel \
+  tree python3 deltarpm
+
+# install epel　repo
+amazon-linux-extras install epel -y && \
+  yum update && \
+  echo "install epel-release repo."
+
+# install chromium
+yum install -y \
+  chromium chromium-common
+
+# install python3 packages
+pip3 install importlib_metadata
 
 mkdir -p build/chromium
 
@@ -66,7 +79,7 @@ cd src
 # see https://github.com/adieuadieu/serverless-chrome/issues/41#issuecomment-340859918
 # Thank you, Geert-Jan Brits (@gebrits)!
 #
-SANDBOX_IPC_SOURCE_PATH="content/browser/sandbox_ipc_linux.cc"
+export SANDBOX_IPC_SOURCE_PATH="content/browser/sandbox_ipc_linux.cc"
 
 sed -e 's/PLOG(WARNING) << "poll";/PLOG(WARNING) << "poll"; failed_polls = 0;/g' -i "$SANDBOX_IPC_SOURCE_PATH"
 
@@ -77,14 +90,15 @@ mkdir -p out/Headless && \
   echo 'is_debug = false' >> out/Headless/args.gn && \
   echo 'symbol_level = 0' >> out/Headless/args.gn && \
   echo 'is_component_build = false' >> out/Headless/args.gn && \
-  echo 'remove_webcore_debug_symbols = true' >> out/Headless/args.gn && \
+  # echo 'remove_webcore_debug_symbols = true' >> out/Headless/args.gn && \
   echo 'enable_nacl = false' >> out/Headless/args.gn && \
   gn gen out/Headless
 
 # build chromium headless shell
 ninja -C out/Headless headless_shell
 
-cp out/Headless/headless_shell "$BUILD_BASE/bin/headless-chromium-unstripped"
+# cp out/Headless/headless_shell "$BUILD_BASE/bin/headless-chromium-unstripped"
+cp out/Headless/headless_shell "$BUILD_BASE/bin/headless-chromium"
 
 cd "$BUILD_BASE"
 

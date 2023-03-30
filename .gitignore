@@ -69,3 +69,6 @@ headless-chromium-amazonlinux-2017-03.zip
 packages/lambda/integration-test/headless-chromium
 
 .env
+
+# My Credentials
+packages/lambda/lambda_layer/aws
