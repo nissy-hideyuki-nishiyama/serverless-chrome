@@ -19,7 +19,7 @@ BUILD_BASE=$(pwd)
 VERSION=${VERSION:-master}
 CHROME_DRIVER_VERSION=${CHROME_DRIVER_VERSION:-master}
 
-# nishiyma locate
+# nishiyama locate
 PROFILE=${PROFILE:-default}
 S3BUCKET=${S3BUCKET:-nissy-jp-distfiles-tky}
 S3PREFIX=${S3PREFIX:-build_lambda/lambda_layer}
@@ -28,7 +28,7 @@ cd "$BUILD_BASE"
 
 # build distfile package
 mkdir -p "${BUILD_BASE}/distfiles/headless-chromium"
-strip -o "$BUILD_BASE/distfiles/headless-chromium/headless_shell" build/chromium/src/out/Headless/headless_shell
+strip -o "${BUILD_BASE}/distfiles/headless-chromium/headless_shell" build/chromium/src/out/Headless/headless_shell
 # cp -rf /build/chromium/src/out/Headless/swiftshader "${BUILD_BASE}/distfiles/headless-chromium/"
 # cd "${BUILD_BASE}/distfiles/headless-chromium/"
 # ln -s ./swiftshader/libEGL.so ./libEGL.so
@@ -57,4 +57,3 @@ echo "build finished."
 # upload s3 aws
 echo "upload headless-choromium_${VERSION}.zip to s3://${S3BUCKET}/${S3PREFIX}/."
 aws --profile ${PROFILE} s3 cp headless-chromium_${VERSION}.zip s3://${S3BUCKET}/${S3PREFIX}/
-
